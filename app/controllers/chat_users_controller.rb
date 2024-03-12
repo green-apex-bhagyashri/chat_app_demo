@@ -4,7 +4,6 @@ class ChatUsersController < ApplicationController
   before_action :set_chat
 
   def create
-  	binding.pry
     @chat_user = @chat.chat_users.where(user_id: @current_user.id).first_or_create
     render json: @chat
   end

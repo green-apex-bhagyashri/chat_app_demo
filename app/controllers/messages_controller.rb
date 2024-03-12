@@ -1,7 +1,6 @@
 class MessagesController < ApplicationController
    before_action :authorize_request #, except: :create
   def create
-    binding.pry
     @chat = Chat.find_by(id: params[:chat_id])
      render json:{messge: "chat room not found"} if @chat.nil?
       @message = @chat.messages.new(message_params)
