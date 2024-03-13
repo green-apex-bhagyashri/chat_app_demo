@@ -9,11 +9,11 @@ Rails.application.routes.draw do
   # Defines the root path route ("/")
   # root "posts#index"
   resources :users, param: :_username
-  # resources :chats
-  # resources :messages
+
   resources :chats do
     resources :messages #, param: :chat_id
     resources :chat_users
+    post "/user_to_user_chat", to: "messages#user_to_user_chat"
   end
 
   post '/auth/login', to: 'authentication#login'

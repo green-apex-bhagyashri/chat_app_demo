@@ -2,11 +2,11 @@ class ChatChannel < ApplicationCable::Channel
   MAX_USERS = 2
   def subscribed
     @chat = Chat.find_by(id: params[:chat_id])
-    if @chat.users.count <= MAX_USERS
+    # if @chat.users.count <= MAX_USERS
       stream_for @chat
-    else
-      reject
-    end
+    # else
+    #   reject
+    # end
   end
 
   def receive(data)
@@ -15,7 +15,7 @@ class ChatChannel < ApplicationCable::Channel
 
   def unsubscribed
     @chat = Chat.find_by(id: params[:chat_id])
-    broadcast_user_count(@chat)
+    # broadcast_user_count(@chat)
   end
 
   private
