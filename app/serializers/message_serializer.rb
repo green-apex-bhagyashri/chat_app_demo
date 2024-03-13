@@ -2,7 +2,8 @@ class MessageSerializer < ActiveModel::Serializer
   attributes :id, :content, :chat, :user, :image
 
   def user
-    user = object.user
+    # user = object.user
+    ActiveModelSerializers::Adapter::Json.new(UserSerializer.new(object.user)).serializable_hash
   end
   def chat
     user = object.chat
