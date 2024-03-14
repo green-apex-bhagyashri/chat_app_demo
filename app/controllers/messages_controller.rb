@@ -5,9 +5,9 @@ class MessagesController < ApplicationController
     @message = @chat.messages.new(message_params)
     @message.user = @current_user
     if @message.save
-      serialized_data = ActiveModelSerializers::Adapter::Json.new(MessageSerializer.new(@message)).serializable_hash
+      serialized_data = MessageSerializer.new(@message).serializable_hash
       ChatChannel.broadcast_to @chat, serialized_data
-      render json: @message
+      render json: serialized_data
     else
       render json: @message.errors
     end
@@ -19,13 +19,15 @@ class MessagesController < ApplicationController
       @recipient =  User.find_by(id:  params[:message][:recipient_id])
       return render json: {message: "Recipient not found with this Id = #{params[:message][:recipient_id]}"} if @recipient.nil?
       return render json: {message: "You can't start a chat with yourself"} if @current_user.id == params[:message][:recipient_id].to_i
-      
-      @message = @chat.messages.new(message_params)
+
+      # @message = @chat.messages.new(message_params)
+      @message = @chat.messages.new(params[:message].permit!)
       @message.user = @current_user
       if @message.save
-        serialized_data = ActiveModelSerializers::Adapter::Json.new(RecipientMessageSerializer.new(@message)).serializable_hash
-        RoomChannel.broadcast_to @recipient, serialized_data
-        render json: @message
+        serialized_data = RecipientMessageSerializer.new(@message).serializable_hash
+        # RoomChannel.broadcast_to @recipient, serialized_data
+        ActionCable.server.broadcast("room_channel_#{@message.recipient_id}", serialized_data)
+        render json: serialized_data
       else
         render json: @message.errors
       end
@@ -40,6 +42,7 @@ class MessagesController < ApplicationController
   end
 
   def message_params
-    params.require(:message).permit(:content, :chat_id, :user_id, :recipient_id, :image)
+    # params.require(:message).permit(:content, :chat_id, :user_id, :recipient_id, images:[])
+    params.require(:message).permit(:content, :recipient_id, images: [])
   end
 end
