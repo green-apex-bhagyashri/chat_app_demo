@@ -5,7 +5,7 @@ class UsersController < ApplicationController
   # GET /users
   def index
     @users = User.all
-    render json: @users, status: :ok
+    render json: UserSerializer.new(@user).serializable_hash, status: :ok
   end
 
   # GET /users/{username}
@@ -22,19 +22,6 @@ class UsersController < ApplicationController
       render json: { errors: @user.errors.full_messages },
              status: :unprocessable_entity
     end
-  end
-
-  # PUT /users/{username}
-  def update
-    unless @user.update(user_params)
-      render json: { errors: @user.errors.full_messages },
-             status: :unprocessable_entity
-    end
-  end
-
-  # DELETE /users/{username}
-  def destroy
-    @user.destroy
   end
 
   private
